@@ -1,0 +1,35 @@
+{
+  "json": {
+    "record_free": [],
+    "record_free_item": [],
+    "record_item": [],
+    "record": [
+      {
+        "deviceId": "8f5a1d19-8b7b-4837-8d94-2f299642f131",
+        "endTime": "2020-11-26 13:00:25",
+        "id": "b064813b-f480-4aa7-8ced-4f9ec9ac24b8",
+        "isTask": "1",
+        "isUpload": "0",
+        "latitude": null,
+        "longitude": null,
+        "measurementTaskDetailId": "13e4da21-0464-4483-816c-4da6ff1b54a1",
+        "measurementTaskId": "9641b683-da7b-4c3c-82cf-8f05fe981e62",
+        "startTime": "2020-11-26 13:00:22",
+        "userId": "2b50eb56-c30f-46f9-80fd-c0d6cf8bc644"
+      },
+      {
+        "deviceId": "137867e3-f986-4411-9b37-552db77fdfc6",
+        "endTime": "2020-11-26 13:00:40",
+        "id": "73c96c57-d965-4857-8af9-46d97abd10f2",
+        "isTask": "1",
+        "isUpload": "0",
+        "latitude": null,
+        "longitude": null,
+        "measurementTaskDetailId": "50c97eae-9770-43c1-bc9f-64ce1f3f5758",
+        "measurementTaskId": "9641b683-da7b-4c3c-82cf-8f05fe981e62",
+        "startTime": "2020-11-26 13:00:34",
+        "userId": "2b50eb56-c30f-46f9-80fd-c0d6cf8bc644"
+      }
+    ]
+  }
+}

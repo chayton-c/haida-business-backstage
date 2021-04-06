@@ -1,0 +1,37 @@
+spring:
+  #配置freemarker
+  freemarker:
+    suffix: .ftl
+    charset: UTF-8
+    template-loader-path:
+      - classpath:/templates
+  #配置静态资源
+  mvc:
+    static-path-pattern: /**
+  resource:
+    static-locations: classpath:/static/
+#JimuReport[minidao配置]
+minidao :
+  base-package: org.jeecg.modules.jmreport.desreport.dao*
+  db-type: mysql
+#JimuReport[上传配置]
+jeecg :
+  # local|minio|alioss
+  uploadType: local
+  # local
+  path :
+    #文件路径
+    upload: /opt/upload
+  # alioss
+  oss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    accessKey: ??
+    secretKey: ??
+    staticDomain: ??
+    bucketName: ??
+  # minio
+  minio:
+    minio_url: http://minio.jeecg.com
+    minio_name: ??
+    minio_pass: ??
+    bucketName: ??
