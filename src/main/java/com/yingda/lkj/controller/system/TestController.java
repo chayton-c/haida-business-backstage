@@ -1,5 +1,6 @@
 package com.yingda.lkj.controller.system;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.yingda.lkj.beans.entity.backstage.line.StationRailwayLine;
 import com.yingda.lkj.beans.entity.backstage.location.Location;
 import com.yingda.lkj.beans.entity.backstage.opc.OpcMark;
@@ -24,6 +25,7 @@ import com.yingda.lkj.service.system.AuthService;
 import com.yingda.lkj.service.system.MenuService;
 import com.yingda.lkj.service.system.RoleService;
 import com.yingda.lkj.service.system.UserService;
+import com.yingda.lkj.utils.JsonUtils;
 import com.yingda.lkj.utils.SpringContextUtil;
 import com.yingda.lkj.utils.date.DateUtil;
 import com.yingda.lkj.utils.location.LocationUtil;
@@ -159,39 +161,55 @@ public class TestController extends BaseController {
         return new Json(JsonMessage.SUCCESS);
     }
 
-    @RequestMapping("/taiho")
+    private String accessToken;
+
+    @RequestMapping("/getAccessToken")
     public Json getAccessToken() throws IOException {
         URL url = new URL("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=wwe591ecb89c96c931&corpsecret" +
                 "=IfyZyG7MAu3CCUVMHOgiWDMwaNhvbFVBblrTsgsj41Y");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         String input = new String(con.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        TokenMessage parse = JsonUtils.parse(input, TokenMessage.class);
+        String access_token = parse.getAccess_token();
+        accessToken = access_token;
 
-        System.out.println(input);
-        return new Json(JsonMessage.SUCCESS, input);
+        System.out.println(access_token);
+        return new Json(JsonMessage.SUCCESS, access_token);
+    }
+
+    class TokenMessage {
+        private String access_token;
+
+        public String getAccess_token() {
+            return access_token;
+        }
+
+        public void setAccess_token(String access_token) {
+            this.access_token = access_token;
+        }
     }
 
     @RequestMapping("/sendMessage")
     public Json sendMessage() throws IOException {
-        String token = """
-                cDvRNjafdiJ1UmEWh_TDMJyR6zyLnbGPs-8FKkVjjBZmoKARxlze3WJj1ktjrmM9nsv4yVpiDukZFejLogrY9jcNBgnAgyLdgtZxCm_BH3yMWvo7HgQ64uiK0hodnXBMKzSJNoXowwzIot5a3vXi9qjBsHn1M6ZQvV3yQXYTjFPtXcLvuJ3MNUAyVewW4vdDXo2y00ySgvtHJO7_d7FN4w
-                """;
-        URL url = new URL("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=" + token);
+        String message = req.getParameter("message");
+        getAccessToken();
+        URL url = new URL("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=" + accessToken);
 
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setDoOutput(true);
         con.setRequestMethod("POST");
-        con.getOutputStream().write("""
+        con.getOutputStream().write(String.format("""
                 {
                    "touser" : "@all",
                    "msgtype" : "text",
                    "agentid" : 1000002,
                    "text" : {
-                       "content" : "testtesttest"
+                       "content" : "%s"
                    },
                    "safe":0,
                 }
-                """.getBytes());
+                """, message).getBytes());
 
         String input = new String(con.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
@@ -202,9 +220,6 @@ public class TestController extends BaseController {
 
     @RequestMapping("/uploadExcel")
     public Json uploadExcel() throws IOException {
-        String token = """
-                cDvRNjafdiJ1UmEWh_TDMJyR6zyLnbGPs-8FKkVjjBZmoKARxlze3WJj1ktjrmM9nsv4yVpiDukZFejLogrY9jcNBgnAgyLdgtZxCm_BH3yMWvo7HgQ64uiK0hodnXBMKzSJNoXowwzIot5a3vXi9qjBsHn1M6ZQvV3yQXYTjFPtXcLvuJ3MNUAyVewW4vdDXo2y00ySgvtHJO7_d7FN4w""";
-
         File file = new File("C://Users/goubi/Desktop/excel.xlsx");
 
         HttpHeaders headers = new HttpHeaders();
@@ -221,7 +236,7 @@ public class TestController extends BaseController {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        String serverUrl = "https://qyapi.weixin.qq.com/cgi-bin/media/upload?access_token=" + token + "&type=file";
+        String serverUrl = "https://qyapi.weixin.qq.com/cgi-bin/media/upload?access_token=" + accessToken + "&type=file";
         System.out.println(serverUrl);
         System.out.println(body);
         RestTemplate restTemplate = new RestTemplate();
