@@ -29,6 +29,7 @@ import com.yingda.lkj.utils.JsonUtils;
 import com.yingda.lkj.utils.SpringContextUtil;
 import com.yingda.lkj.utils.date.DateUtil;
 import com.yingda.lkj.utils.location.LocationUtil;
+import com.yingda.lkj.utils.wechat.enterprise.EnterpriseWeChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -159,137 +160,6 @@ public class TestController extends BaseController {
         opcMarkBaseService.bulkInsert(opcMarks);
 
         return new Json(JsonMessage.SUCCESS);
-    }
-
-    private String accessToken;
-
-    @RequestMapping("/getAccessToken")
-    public Json getAccessToken() throws IOException {
-        URL url = new URL("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=wwe591ecb89c96c931&corpsecret" +
-                "=IfyZyG7MAu3CCUVMHOgiWDMwaNhvbFVBblrTsgsj41Y");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-        String input = new String(con.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        TokenMessage parse = JsonUtils.parse(input, TokenMessage.class);
-        String access_token = parse.getAccess_token();
-        accessToken = access_token;
-
-        System.out.println(access_token);
-        return new Json(JsonMessage.SUCCESS, access_token);
-    }
-
-    class TokenMessage {
-        private String access_token;
-
-        public String getAccess_token() {
-            return access_token;
-        }
-
-        public void setAccess_token(String access_token) {
-            this.access_token = access_token;
-        }
-    }
-
-    @RequestMapping("/sendMessage")
-    public Json sendMessage() throws IOException {
-        String message = req.getParameter("message");
-        getAccessToken();
-        URL url = new URL("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=" + accessToken);
-
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setDoOutput(true);
-        con.setRequestMethod("POST");
-        con.getOutputStream().write(String.format("""
-                {
-                   "touser" : "@all",
-                   "msgtype" : "text",
-                   "agentid" : 1000002,
-                   "text" : {
-                       "content" : "%s"
-                   },
-                   "safe":0,
-                }
-                """, message).getBytes());
-
-        String input = new String(con.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-
-
-        System.out.println(input);
-        return new Json(JsonMessage.SUCCESS);
-    }
-
-    @RequestMapping("/uploadExcel")
-    public Json uploadExcel() throws IOException {
-        File file = new File("C://Users/goubi/Desktop/excel.xlsx");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.setContentLength(file.length());
-        headers.setContentDispositionFormData("media",file.getName());
-
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("content-type", "application/octet-stream");
-        body.add("filename", "excel.xlsx");
-        body.add("name", "media");
-        body.add("filelength", file.length());
-        body.add("file", new FileSystemResource(file.getPath()));
-
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-        String serverUrl = "https://qyapi.weixin.qq.com/cgi-bin/media/upload?access_token=" + accessToken + "&type=file";
-        System.out.println(serverUrl);
-        System.out.println(body);
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.postForEntity(serverUrl, requestEntity, String.class);
-        System.out.println(response);
-
-
-        return new Json(JsonMessage.SUCCESS, response);
-    }
-
-    @RequestMapping("/sendFile")
-    public Json sendFile() throws IOException {
-        String token = """
-                cDvRNjafdiJ1UmEWh_TDMJyR6zyLnbGPs-8FKkVjjBZmoKARxlze3WJj1ktjrmM9nsv4yVpiDukZFejLogrY9jcNBgnAgyLdgtZxCm_BH3yMWvo7HgQ64uiK0hodnXBMKzSJNoXowwzIot5a3vXi9qjBsHn1M6ZQvV3yQXYTjFPtXcLvuJ3MNUAyVewW4vdDXo2y00ySgvtHJO7_d7FN4w
-                """;
-        URL url = new URL("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=" + token);
-
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setDoOutput(true);
-        con.setRequestMethod("POST");
-        con.getOutputStream().write("""
-                {
-                   "touser" : "@all",
-                   "msgtype" : "file",
-                   "agentid" : 1000002,
-                   "file" : {
-                    "media_id" : "3IYPzePGodrxAcZMkJM1jkZGeE3-v2hZYqhC3mZGooic"
-                   },
-                   "safe":0,
-                }
-                """.getBytes());
-
-        String input = new String(con.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-
-
-        System.out.println(input);
-        return new Json(JsonMessage.SUCCESS);
-    }
-
-    public static String getParamsString(Map<String, String> params) throws UnsupportedEncodingException {
-        StringBuilder result = new StringBuilder();
-
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            result.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
-            result.append("=");
-            result.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
-            result.append("&");
-        }
-
-        String resultString = result.toString();
-        return resultString.length() > 0
-                ? resultString.substring(0, resultString.length() - 1)
-                : resultString;
     }
 
     @RequestMapping("/importOpc")

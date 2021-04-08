@@ -51,6 +51,14 @@ public class Scheduler {
     }
 
     /**
+     * <p>开始/结束日计划</p>
+     * <p>每分钟</p>
+     */
+    @Scheduled(cron = "0 0/1 * * * ?")
+    public void sendEnterpriseMessage() {
+    }
+
+    /**
      * <p>已关闭方案</p>
      * <p>每小时执行</p>
      */

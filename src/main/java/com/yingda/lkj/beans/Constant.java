@@ -17,7 +17,7 @@ public class Constant {
 
     public static final Long ONE_DAY_MILLIONS = 86400000L;
 
-    public static boolean DEBUG = false;
+    public static boolean DEBUG = true;
 
     /**
      * <p>token在请求的header(也可能放到post里？)中的key的名字</p>
