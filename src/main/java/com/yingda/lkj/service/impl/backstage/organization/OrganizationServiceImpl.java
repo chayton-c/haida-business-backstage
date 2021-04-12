@@ -64,7 +64,9 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         try {
             // 直接返回内存，可能会被操作，所以返回一个复制的
-            return PojoUtils.copyPojoList(collectFromCache, Organization.class);
+            List<Organization> organizations = PojoUtils.copyPojoList(collectFromCache, Organization.class);
+            organizations.forEach(x -> x.setOrganizationList(new ArrayList<>()));
+            return organizations;
         } catch (ReflectiveOperationException e) {
             LOGGER.error("反射异常，不可能出错的，除非改了构造方法", e);
             return null;
@@ -116,14 +118,19 @@ public class OrganizationServiceImpl implements OrganizationService {
             String parentId = organization.getParentId();
             Organization parent = raw.stream().filter(x -> x.getId().equals(parentId)).findFirst().orElse(null);
             if (parent == null) {
+                System.out.println("parent == null");
+                System.out.println(organization.getName());
                 result.remove(organization);
                 result.add(organization);
                 continue;
             }
             List<Organization> childrens = Optional.ofNullable(parent.getOrganizationList()).orElse(new ArrayList<>());
+            System.out.println("childrens");
+            System.out.println(organization.getName());
             childrens.remove(organization);
             childrens.add(organization);
             parent.setOrganizationList(childrens);
+            result.remove(parent);
             result.add(parent);
         }
         if (result.size() == raw.size()) return result;
@@ -133,7 +140,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public List<Organization> getCompleteTree() {
         init();
-        return jsonified(showDown()).stream().sorted(Comparator.comparing(Organization::getSeq)).collect(Collectors.toList());
+        return jsonified(showDown());
     }
 
 

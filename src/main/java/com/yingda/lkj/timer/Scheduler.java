@@ -5,6 +5,8 @@ import com.yingda.lkj.service.backstage.constructioncontrolplan.ConstructionCont
 import com.yingda.lkj.service.backstage.constructioncontrolplan.ConstructionDailyPlanService;
 import com.yingda.lkj.socket.ConstructionDailyPlanWebSocket;
 import com.yingda.lkj.utils.SpringContextUtil;
+import com.yingda.lkj.utils.date.DateUtil;
+import com.yingda.lkj.utils.wechat.enterprise.EnterpriseWeChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
@@ -12,6 +14,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
+
+import java.sql.Timestamp;
 
 /**
  * @author hood  2020/4/7
@@ -56,6 +60,10 @@ public class Scheduler {
      */
     @Scheduled(cron = "0 0/1 * * * ?")
     public void sendEnterpriseMessage() {
+        String currentTime = DateUtil.format(new Timestamp(System.currentTimeMillis()), "HH:mm:ss");
+        if (currentTime.endsWith(":30:00"))
+            EnterpriseWeChatClient.sendMarkDown();
+//            EnterpriseWeChatClient.sendMessage(currentTime + " 调用定时器");
     }
 
     /**

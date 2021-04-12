@@ -194,20 +194,12 @@ public class Organization {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Organization that = (Organization) o;
-        return level == that.level &&
-                Objects.equals(id, that.id) &&
-                Objects.equals(parentId, that.parentId) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(remark, that.remark) &&
-                Objects.equals(code, that.code) &&
-                Objects.equals(addTime, that.addTime) &&
-                Objects.equals(updateTime, that.updateTime);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, parentId, name, description, remark, level, code, addTime, updateTime);
+        return Objects.hash(id);
     }
 
     @Basic

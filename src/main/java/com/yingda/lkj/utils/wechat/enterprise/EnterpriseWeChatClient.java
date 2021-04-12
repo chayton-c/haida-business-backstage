@@ -53,7 +53,7 @@ public class EnterpriseWeChatClient {
             con.getOutputStream().write(String.format(
                 """
                 {
-                   "touser" : "SunZan",
+                   "touser" : "@all",
                    "msgtype" : "text",
                    "agentid" : 1000002,
                    "text" : {
@@ -67,6 +67,90 @@ public class EnterpriseWeChatClient {
             System.out.println(input);
         } catch (Exception e) {
             log.error("EnterpriseWeChatClient.sendMessage()", e);
+        }
+    }
+
+    /**
+     * 图文消息
+     */
+    public static void sendLink() {
+        try {
+            getAccessToken();
+            URL url = new URL("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=" + accessToken);
+
+
+            String message = """
+                {
+                   "touser" : "@all",
+                   "msgtype" : "news",
+                   "agentid" : 1000002,
+                   "news" : {
+                       "articles" : [
+                           {
+                               "title" : "中秋节礼品领取",
+                               "description" : "今年中秋节公司有豪礼相送",
+                               "url" : "https://work.weixin.qq.com/api/doc/90000/90135/90236#%E6%96%87%E6%9C%AC%E6%B6%88%E6%81%AF",
+                               "picurl" : "http://res.mail.qq.com/node/ww/wwopenmng/images/independent/doc/test_pic_msg1.png"
+                           }
+                                ]
+                   },
+                   "enable_id_trans": 0,
+                   "enable_duplicate_check": 0,
+                   "duplicate_check_interval": 1800
+                }
+                """;
+
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setDoOutput(true);
+            con.setRequestMethod("POST");
+            con.getOutputStream().write(message.getBytes());
+
+            String input = new String(con.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            System.out.println(input);
+        } catch (Exception e) {
+            log.error("EnterpriseWeChatClient.sendLink()", e);
+        }
+    }
+
+    public static void sendMarkDown() {
+        try {
+            getAccessToken();
+            URL url = new URL("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=" + accessToken);
+
+            String message = """
+                {
+                   "touser" : "@all",
+                   "msgtype": "markdown",
+                   "agentid" : 1000002,
+                   "markdown": {
+                        "content": "您的会议室已经预定，稍后会同步到`邮箱`\s
+                                                >**事项详情**\s
+                                                >事　项：<font color=\\"info\\">开会</font>\s
+                                                >组织者：@miglioguan\s
+                                                >参与者：@miglioguan、@kunliu、@jamdeezhou、@kanexiong、@kisonwang\s
+                                                >\s
+                                                >会议室：<font color=\\"info\\">海达TIT 1楼 301</font>\s
+                                                >日　期：<font color=\\"warning\\">2021年5月18日</font>\s
+                                                >时　间：<font color=\\"comment\\">上午10:30-11:00</font>\s
+                                                >\s
+                                                >请准时参加会议。\s
+                                                >\s
+                                                >如需修改会议信息，请点击：[修改会议信息](https://work.weixin.qq.com)"
+                   },
+                   "enable_duplicate_check": 0,
+                   "duplicate_check_interval": 1800
+                }
+                """;
+
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setDoOutput(true);
+            con.setRequestMethod("POST");
+            con.getOutputStream().write(message.getBytes());
+
+            String input = new String(con.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            System.out.println(input);
+        } catch (Exception e) {
+            log.error("EnterpriseWeChatClient.sendMarkDown()", e);
         }
     }
 
@@ -109,7 +193,7 @@ public class EnterpriseWeChatClient {
             con.setRequestMethod("POST");
             con.getOutputStream().write(String.format("""
                     {
-                       "touser" : "SunZan",
+                       "touser" : "@all",
                        "msgtype" : "file",
                        "agentid" : 1000002,
                        "file" : {
